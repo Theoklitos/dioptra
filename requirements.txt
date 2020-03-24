@@ -1,0 +1,3 @@
+Pillow==7.0.0
+picamera==0.5
+pynput
