@@ -13,7 +13,8 @@ class Buttons(subscriber):
         self.standard_overlay = None
         self.options_overlay = None
         bus.register_consumer(self, 'touch')
-        self.show_standard_layout()
+        #self.show_standard_layout()
+        self.show_options_layout()
 
     def show_standard_layout(self):
         """The initial, default layout with only three buttons"""
@@ -36,14 +37,23 @@ class Buttons(subscriber):
         pad = Image.new('RGBA', (640,384,))
         ok_image = Image.open('icons/ok.png')
         pad.paste(ok_image, (550, 10), ok_image)
+        crosshair_image = Image.open('icons/crosshair_change.png')
+        pad.paste(crosshair_image, (550, 105), crosshair_image)
+        video_image = Image.open('icons/video.png')
+        pad.paste(video_image, (550, 200), video_image)
+        photo_image = Image.open('icons/photo.png')
+        pad.paste(photo_image, (550, 295), photo_image)
+
         up_image = Image.open('icons/up.png')
-        pad.paste(up_image, (250, 10), up_image)
+        pad.paste(up_image, (280, 10), up_image)
         down_image = Image.open('icons/down.png')
-        pad.paste(up_image, (250, 410), down_image)
-        #down_image = Image.open('icons/down.png')
-        #pad.paste(up_image, (250, 410), down_image)
+        pad.paste(down_image, (280, 295), down_image)
+
+        left_image = Image.open('icons/left.png')
+        pad.paste(left_image, (90, 100), left_image)
         right_image = Image.open('icons/right.png')
-        pad.paste(right_image, (450, 200), right_image)
+        pad.paste(right_image, (400, 100), right_image)
+
         if(self.standard_overlay):
             self.camera.remove_overlay(self.standard_overlay)
             self.standard_overlay = None
@@ -51,17 +61,7 @@ class Buttons(subscriber):
         self.options_overlay = options_overlay
 
     def process(self,event):
-        #if(self._should_throttle()):
-        #    return
         self._check_if_button_was_touched(event.get_data())
-
-    def _should_throttle(self):
-        now = time.time()
-        if ((now - self.timestamp_of_last_touch) < 0.7): #throttle
-            return True
-        else:
-            self.timestamp_of_last_touch = now
-            return False
 
     def _is_point_within(self,x,y,area):
         return (x > area[0] and x < area[1]) & (y > area[2] and y < area[3])

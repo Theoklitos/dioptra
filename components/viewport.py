@@ -30,7 +30,7 @@ class Viewport(subscriber):
         data = event.get_data()
         if(topic=='zoom'):
             self.zoom(data)
-        elif(topic=='adjust'):
+        elif(topic=='adjusta'):
             self.adjust(data)
 
     def zoom(self, direction):
