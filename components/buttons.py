@@ -43,16 +43,14 @@ class Buttons(subscriber):
         pad.paste(video_image, (550, 200), video_image)
         photo_image = Image.open('icons/photo.png')
         pad.paste(photo_image, (550, 295), photo_image)
-
         up_image = Image.open('icons/up.png')
         pad.paste(up_image, (280, 10), up_image)
         down_image = Image.open('icons/down.png')
         pad.paste(down_image, (280, 295), down_image)
-
         left_image = Image.open('icons/left.png')
-        pad.paste(left_image, (90, 100), left_image)
+        pad.paste(left_image, (135, 154), left_image)
         right_image = Image.open('icons/right.png')
-        pad.paste(right_image, (400, 100), right_image)
+        pad.paste(right_image, (425, 154), right_image)
 
         if(self.standard_overlay):
             self.camera.remove_overlay(self.standard_overlay)
@@ -79,4 +77,10 @@ class Buttons(subscriber):
                 self.show_options_layout()
         elif(self.options_overlay):
             if self._is_point_within(x,y,(700,790,30,110)):
-                self.show_standard_layout() #self.bus.post(event('crosshair','next'))
+                self.show_standard_layout()
+            elif self._is_point_within(x,y,(700,790,145,230)):
+                self.bus.post(event('crosshair','next'))
+            elif self._is_point_within(x,y,(700,790,260,350)):
+                self.bus.post(event('record','start'))
+            elif self._is_point_within(x,y,(700,790,375,470)):
+                self.bus.post(event('photo',''))

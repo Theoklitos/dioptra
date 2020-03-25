@@ -17,27 +17,21 @@ class UserInput():
         if(pressed):
             self.bus.post(event('touch',(x,y)))
 
-    def _create_adjustement_event(self,direction):
-        return event('adjust',direction)
-
-    def _create_zoom_event(self,direction):
-        return event('zoom',direction)
-
     def on_keyboard_key_press(self,key):
         #adjustements
         if(key == keyboard.KeyCode.from_char('a')):
-            self.bus.post(self._create_adjustement_event('left'))
+            self.bus.post(event('adjust','left'))
         elif(key == keyboard.KeyCode.from_char('d')):
-            self.bus.post(self._create_adjustement_event('right'))
+            self.bus.post(event('adjust','right'))
         elif(key == keyboard.KeyCode.from_char('w')):
-            self.bus.post(self._create_adjustement_event('up'))
+            self.bus.post(event('adjust','up'))
         elif(key == keyboard.KeyCode.from_char('s')):
-            self.bus.post(self._create_adjustement_event('down'))
+            self.bus.post(event('adjust','down'))
         #zooms
         elif(key == keyboard.KeyCode.from_char('q')):
-            self.bus.post(self._create_adjustement_event('in'))
+            self.bus.post(event('zoom','in'))
         elif(key == keyboard.KeyCode.from_char('e')):
-            self.bus.post(self._create_adjustement_event('out'))
+            self.bus.post(event('zoom','out'))
         #temp bindings for testing
         elif(key == keyboard.KeyCode.from_char('z')):
             self.bus.post(event('crosshair','next'))
@@ -47,3 +41,5 @@ class UserInput():
             self.bus.post(event('crosshair',2))
         elif(key == keyboard.KeyCode.from_char('3')):
             self.bus.post(event('crosshair',3))
+        elif(key == keyboard.KeyCode.from_char('p')):
+            self.bus.post(event('photo', ''))

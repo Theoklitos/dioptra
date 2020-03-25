@@ -21,8 +21,6 @@ class GuiText(subscriber):
     def refresh_time(self):
         now = datetime.now()
         timestamp_readable = now.strftime("%d-%b-%Y (%H:%M:%S)") #https://strftime.org/
-        #self.camera.annotate_background = picamera.Color('black')
-        #self.camera.annotate_text = timestamp_readable
 
     def process(self,event):
         type = event.get_data()['type']
