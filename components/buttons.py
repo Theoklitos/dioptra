@@ -1,7 +1,7 @@
 from geeteventbus.subscriber import subscriber
 from geeteventbus.event import event
 from PIL import Image
-import picamera, time
+import picamera
 
 class Buttons(subscriber):
     """Draws the buttons and switches between the different button overlays"""
@@ -29,7 +29,7 @@ class Buttons(subscriber):
         if(self.options_overlay):
             self.camera.remove_overlay(self.options_overlay)
             self.options_overlay = None
-        standard_overlay = self.camera.add_overlay(pad.tobytes(), pad.size, layer=3)
+        standard_overlay = self.camera.add_overlay(pad.tobytes(), pad.size, layer=4)
         self.standard_overlay = standard_overlay
 
     def show_options_layout(self):
@@ -55,7 +55,7 @@ class Buttons(subscriber):
         if(self.standard_overlay):
             self.camera.remove_overlay(self.standard_overlay)
             self.standard_overlay = None
-        options_overlay = self.camera.add_overlay(pad.tobytes(), pad.size, layer=3)
+        options_overlay = self.camera.add_overlay(pad.tobytes(), pad.size, layer=4)
         self.options_overlay = options_overlay
 
     def process(self,event):

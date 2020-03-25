@@ -25,6 +25,7 @@ class UserInput():
             self.bus.post(event('adjust','right'))
         elif(key == keyboard.KeyCode.from_char('w')):
             self.bus.post(event('adjust','up'))
+            print("posted event!")
         elif(key == keyboard.KeyCode.from_char('s')):
             self.bus.post(event('adjust','down'))
         #zooms

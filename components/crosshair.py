@@ -11,6 +11,7 @@ class Crosshair(subscriber):
     def __init__(self,bus,camera,resolution):
         self.camera = camera
         self.crosshair_overlay = None
+        self.crosshair_number = 1
         bus.register_consumer(self, 'crosshair')
         self.set_crosshair(1)
 
@@ -24,6 +25,9 @@ class Crosshair(subscriber):
         else:
             new_crosshair_number = data
         self.set_crosshair(new_crosshair_number)
+
+    def get_crosshair_image(self):
+        return Image.open('crosshairs/crosshair' + str(self.crosshair_number) + '.png')
 
     def set_crosshair(self,number):
         img = Image.open('crosshairs/crosshair' + str(number) + '.png')

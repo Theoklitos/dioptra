@@ -18,13 +18,14 @@ try:
     bus = eventbus()
     user_input = UserInput(bus)
     Viewport(bus,camera,RESOLUTION)
-    Crosshair(bus,camera,RESOLUTION)
+    crosshair = Crosshair(bus,camera,RESOLUTION)
     Buttons(bus,camera)
     gui_text = GuiText(bus,camera)
-    Cameraman(bus,camera)
+    # injecting the crosshair here breaks the observer pattern, but we need it in order
+    # to add the currrent crosshair to videos/photos
+    Cameraman(bus,camera,crosshair)
 
-    while True:
-        gui_text.refresh_time()
+    while True:        
         pass
 
 except KeyboardInterrupt:

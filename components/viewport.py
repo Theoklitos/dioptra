@@ -1,7 +1,6 @@
 from geeteventbus.subscriber import subscriber
 from geeteventbus.event import event
 from time import sleep
-
 import picamera
 
 magnification_levels = {
@@ -51,13 +50,10 @@ class Viewport(subscriber):
 
     def adjust(self, direction):
         step = magnification_levels[self.magnification_level][1]
-        print('step: ' + str(step) + ', direction:' + direction)
         zoom = self.camera.zoom
-        print('previous zoom: ' + str(zoom))
         new_zoom = None
 
         tolerance = magnification_levels[self.magnification_level][0][0] * 2
-        print(tolerance)
         if(direction=='up'):
             new_zoom = (zoom[0]-step,zoom[1],zoom[2],zoom[3])
             self.adjustement = (self.adjustement[0],round(self.adjustement[1]+step,5))
@@ -75,8 +71,6 @@ class Viewport(subscriber):
                 return
             self.adjustement = (self.adjustement[0]+step,self.adjustement[1])
         self.camera.zoom = new_zoom
-        self.camera.annotate_background = picamera.Color('black')
-        self.camera.annotate_text = str(self.camera.zoom) + '                                              '
-        print('zoom AFTER:' + str(self.camera.zoom))
+        time.sleep(1)
 
         self.bus.post(event('status_updates',{'type':'adjustment','value':self.adjustement}))
