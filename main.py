@@ -21,11 +21,13 @@ try:
     crosshair = Crosshair(bus,camera,RESOLUTION)
     Buttons(bus,camera)
     gui_text = GuiText(bus,camera)
+    #gui_text.show_notification_for_seconds('This is a fucking test bra', 3)
+    gui_text.show_notification_for_seconds('Photo saved as 25-Mar-2020_15.46.54.png', 3)
     # injecting the crosshair here breaks the observer pattern, but we need it in order
     # to add the currrent crosshair to videos/photos
     Cameraman(bus,camera,crosshair)
 
-    while True:        
+    while True:
         pass
 
 except KeyboardInterrupt:

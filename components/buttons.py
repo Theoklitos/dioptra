@@ -13,6 +13,7 @@ class Buttons(subscriber):
         self.standard_overlay = None
         self.options_overlay = None
         bus.register_consumer(self, 'touch')
+        bus.register_consumer(self, 'status_update')
         #self.show_standard_layout()
         self.show_options_layout()
 
@@ -51,15 +52,55 @@ class Buttons(subscriber):
         pad.paste(left_image, (135, 154), left_image)
         right_image = Image.open('icons/right.png')
         pad.paste(right_image, (425, 154), right_image)
-
         if(self.standard_overlay):
             self.camera.remove_overlay(self.standard_overlay)
             self.standard_overlay = None
         options_overlay = self.camera.add_overlay(pad.tobytes(), pad.size, layer=4)
         self.options_overlay = options_overlay
 
+    def show_photo_in_progress_layout(self):
+        """When a picture is being taken"""
+        pad = Image.new('RGBA', (640,384,))
+        ok_image = Image.open('icons/ok.png')
+        pad.paste(ok_image, (550, 10), ok_image)
+        crosshair_image = Image.open('icons/crosshair_change.png')
+        pad.paste(crosshair_image, (550, 105), crosshair_image)
+        video_image = Image.open('icons/video.png')
+        pad.paste(video_image, (550, 200), video_image)
+        photo_image = Image.open('icons/photo_in_progress.png')
+        pad.paste(photo_image, (550, 295), photo_image)
+        up_image = Image.open('icons/up.png')
+        pad.paste(up_image, (280, 10), up_image)
+        down_image = Image.open('icons/down.png')
+        pad.paste(down_image, (280, 295), down_image)
+        left_image = Image.open('icons/left.png')
+        pad.paste(left_image, (135, 154), left_image)
+        right_image = Image.open('icons/right.png')
+        pad.paste(right_image, (425, 154), right_image)
+        if(self.standard_overlay):
+            self.camera.remove_overlay(self.standard_overlay)
+            self.standard_overlay = None
+        options_overlay = self.camera.add_overlay(pad.tobytes(), pad.size, layer=4)
+        self.options_overlay = options_overlay
+
+    def show_vide_in_progress_layout(self):
+        """When a video is being recorded"""
+        pass
+
     def process(self,event):
-        self._check_if_button_was_touched(event.get_data())
+        topic = event.get_topic()
+        data = event.get_data()
+        if(topic=='touch'):
+            self._check_if_button_was_touched(data)
+        elif(topic=='status_update'):
+            if(data=='photo:start'):
+                self.show_photo_in_progress_layout()
+            elif(data=='photo:end'):
+                self.show_options_layout()
+            if(data=='video:start'):
+                pass
+            elif(data=='video:end'):
+                pass
 
     def _is_point_within(self,x,y,area):
         return (x > area[0] and x < area[1]) & (y > area[2] and y < area[3])
@@ -81,6 +122,6 @@ class Buttons(subscriber):
             elif self._is_point_within(x,y,(700,790,145,230)):
                 self.bus.post(event('crosshair','next'))
             elif self._is_point_within(x,y,(700,790,260,350)):
-                self.bus.post(event('record','start'))
+                self.bus.post(event('video','start')) # these are commands, not events. status_updates are the events
             elif self._is_point_within(x,y,(700,790,375,470)):
-                self.bus.post(event('photo',''))
+                self.bus.post(event('photo','start'))

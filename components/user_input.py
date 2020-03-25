@@ -25,7 +25,6 @@ class UserInput():
             self.bus.post(event('adjust','right'))
         elif(key == keyboard.KeyCode.from_char('w')):
             self.bus.post(event('adjust','up'))
-            print("posted event!")
         elif(key == keyboard.KeyCode.from_char('s')):
             self.bus.post(event('adjust','down'))
         #zooms
@@ -43,4 +42,6 @@ class UserInput():
         elif(key == keyboard.KeyCode.from_char('3')):
             self.bus.post(event('crosshair',3))
         elif(key == keyboard.KeyCode.from_char('p')):
-            self.bus.post(event('photo', ''))
+            self.bus.post(event('photo', 'start'))
+        elif(key == keyboard.KeyCode.from_char('v')):
+            self.bus.post(event('video', 'start'))

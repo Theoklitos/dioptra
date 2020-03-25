@@ -6,9 +6,9 @@ import picamera
 magnification_levels = {
     1: [(0.05, 0.05, 0.9, 0.9),0.01,'1x'],
     2: [(0.25, 0.25, 0.5, 0.5),0.01,'2x'],
-    3: [(0.375, 0.375, 0.25, 0.25),0.001,'4x'],
-    4: [(0.4375, 0.4375, 0.125, 0.125),0.0001,'8x'],
-    5: [(0.46875, 0.46875, 0.0625, 0.0625),0.00001,'16x']
+    3: [(0.375, 0.375, 0.25, 0.25),0.01,'4x'],
+    4: [(0.4375, 0.4375, 0.125, 0.125),0.01,'8x'],
+    5: [(0.46875, 0.46875, 0.0625, 0.0625),0.01,'16x']
 }
 
 class Viewport(subscriber):
@@ -44,15 +44,18 @@ class Viewport(subscriber):
             if(self.magnification_level == 1):
                 return
             self.magnification_level = self.magnification_level - 1
-        self.camera.zoom = magnification_levels[self.magnification_level][0]
+
+        base_levels = magnification_levels[self.magnification_level][0]
+        # we need to adjust for exising adjustments
+
+        self.camera.zoom = base_levels
         human_readable_value = magnification_levels[self.magnification_level][2]
-        self.bus.post(event('status_updates',{'type':'magnification_level','value':human_readable_value}))
+        self.bus.post(event('status_update',{'type':'magnification_level','value':human_readable_value}))
 
     def adjust(self, direction):
         step = magnification_levels[self.magnification_level][1]
         zoom = self.camera.zoom
         new_zoom = None
-
         tolerance = magnification_levels[self.magnification_level][0][0] * 2
         if(direction=='up'):
             new_zoom = (zoom[0]-step,zoom[1],zoom[2],zoom[3])
@@ -71,6 +74,4 @@ class Viewport(subscriber):
                 return
             self.adjustement = (self.adjustement[0]+step,self.adjustement[1])
         self.camera.zoom = new_zoom
-        time.sleep(1)
-
-        self.bus.post(event('status_updates',{'type':'adjustment','value':self.adjustement}))
+        self.bus.post(event('status_update',{'type':'adjustment','value':self.adjustement}))
