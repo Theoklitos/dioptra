@@ -1,31 +1,37 @@
 #!/usr/bin/python
 
-#good ones:
-#sudo apt install mesa-common-dev
-#pip3 install git+https://github.com/kivy/kivy.git@master
-
-import picamera
-from time import sleep
-
-from components import Viewport
-from components import Crosshair
-from components import Text
-from components import Buttons
+from geeteventbus.eventbus import eventbus
+from components.viewport import Viewport
+from components.user_input import UserInput
+from components.crosshair import Crosshair
+from components.buttons import Buttons
+from components.gui_text import GuiText
+import sys, traceback, picamera
 
 WIDTH = 1920
 HEIGHT = 1140
+RESOLUTION = (WIDTH, HEIGHT)
 
 try:
     camera = picamera.PiCamera()
-
-    Viewport.initialize(camera, WIDTH, HEIGHT)
-    Crosshair.initialize(camera, WIDTH, HEIGHT)
-    Text.initialize(camera, WIDTH)
-    Buttons.initialize(camera)
+    bus = eventbus()
+    user_input = UserInput(bus)
+    viewport = Viewport(bus,camera,RESOLUTION)
+    crosshair = Crosshair(bus,camera,RESOLUTION)
+    buttons = Buttons(bus,camera)
+    gui_text = GuiText(bus,camera)
 
     while True:
-        #Text.refresh_time()
+        gui_text.refresh_time()
         pass
 
+except KeyboardInterrupt:
+    print("User terminated the app.")
 except Exception as e:
-    print(str(e))
+    print("Catstrophic exception!")
+    traceback.print_exc(file=sys.stdout)
+finally:
+    user_input.touch_listener.stop()
+    user_input.keyboard_listener.stop()
+    camera.stop_preview()
+    camera.close()
