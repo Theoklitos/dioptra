@@ -45,3 +45,5 @@ class UserInput():
             self.bus.post(event('photo', 'start'))
         elif(key == keyboard.KeyCode.from_char('v')):
             self.bus.post(event('video', 'start'))
+        elif(key == keyboard.KeyCode.from_char('b')):
+            self.bus.post(event('video', 'end'))

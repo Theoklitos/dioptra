@@ -12,6 +12,7 @@ class Buttons(subscriber):
         self.timestamp_of_last_touch = 0
         self.standard_overlay = None
         self.options_overlay = None
+        self.video_recording_overlay = None
         bus.register_consumer(self, 'touch')
         bus.register_consumer(self, 'status_update')
         #self.show_standard_layout()
@@ -80,12 +81,26 @@ class Buttons(subscriber):
         if(self.standard_overlay):
             self.camera.remove_overlay(self.standard_overlay)
             self.standard_overlay = None
-        options_overlay = self.camera.add_overlay(pad.tobytes(), pad.size, layer=4)
-        self.options_overlay = options_overlay
+        if(self.options_overlay):
+            options_overlay.update(pad.tobytes())
+        else:
+            options_overlay = self.camera.add_overlay(pad.tobytes(), pad.size, layer=4)
+            self.options_overlay = options_overlay
 
-    def show_vide_in_progress_layout(self):
+    def show_video_recording_in_progress_layout(self):
         """When a video is being recorded"""
-        pass
+        pad = Image.new('RGBA', (640,384,))
+        ok_image = Image.open('icons/ok.png')
+        pad.paste(ok_image, (550, 10), ok_image)
+        recording_in_progress_image = Image.open('icons/recording_in_progress.png')
+        pad.paste(recording_in_progress_image, (550, 200), recording_in_progress_image)
+        self.camera.remove_overlay(self.options_overlay)
+        self.options_overlay = None
+        if(self.video_recording_overlay):
+            self.camera.remove_overlay(self.video_recording_overlay)
+            self.video_recording_overlay = None
+        video_recording_overlay = self.camera.add_overlay(pad.tobytes(), pad.size, layer=4)
+        self.video_recording_overlay = video_recording_overlay
 
     def process(self,event):
         topic = event.get_topic()
@@ -93,14 +108,16 @@ class Buttons(subscriber):
         if(topic=='touch'):
             self._check_if_button_was_touched(data)
         elif(topic=='status_update'):
-            if(data=='photo:start'):
+            type = data['type']
+            value = data['value']
+            if(type=='photo' and value =='start'):
                 self.show_photo_in_progress_layout()
-            elif(data=='photo:end'):
+            elif(type=='photo' and value =='end'):
                 self.show_options_layout()
-            if(data=='video:start'):
-                pass
-            elif(data=='video:end'):
-                pass
+            elif(type=='video' and value =='start'):
+                self.show_video_recording_in_progress_layout()
+            elif(type=='video' and value =='end'):
+                self.show_options_layout()
 
     def _is_point_within(self,x,y,area):
         return (x > area[0] and x < area[1]) & (y > area[2] and y < area[3])
@@ -125,3 +142,7 @@ class Buttons(subscriber):
                 self.bus.post(event('video','start')) # these are commands, not events. status_updates are the events
             elif self._is_point_within(x,y,(700,790,375,470)):
                 self.bus.post(event('photo','start'))
+        elif(self.video_recording_overlay):
+            if self._is_point_within(x,y,(700,790,30,110)):
+                self.bus.post(event('video','end')) # again, this is a command. The status update (event) comes later
+                #self.show_options_layout()

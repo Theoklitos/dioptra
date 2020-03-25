@@ -20,7 +20,7 @@ class Crosshair(subscriber):
         data = event.get_data()
         if(data == 'next'):
             new_crosshair_number = self.crosshair_number + 1
-            if(new_crosshair_number > 5):
+            if(new_crosshair_number > 6):
                 new_crosshair_number = 1
         else:
             new_crosshair_number = data

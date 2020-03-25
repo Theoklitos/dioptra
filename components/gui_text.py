@@ -22,8 +22,12 @@ class GuiText(subscriber):
         self._update_overlay()
 
     def _remove_notification_overlay(self):
-        self.camera.remove_overlay(self.notification_overlay)
-        self.notification_overlay = None
+        try:
+            self.camera.remove_overlay(self.notification_overlay)
+        except:
+            pass        
+        finally:
+            self.notification_overlay = None
 
     def show_notification_for_seconds(self,text,seconds):
         notification_image = Image.new("RGBA", (512, 320))
