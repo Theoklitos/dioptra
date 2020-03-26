@@ -41,7 +41,7 @@ class Cameraman(subscriber):
         self.camera.capture(temp_filename)
         self.bus.post(event('notification','Done. Processing...'))
         photo = Image.open(temp_filename)
-        crosshair_image = self.crosshair.get_crosshair_image().resize((1080,1140))
+        crosshair_image = self.get_crosshair_image().resize((1080,1140))
         photo.paste(crosshair_image,(420,0),crosshair_image)
         photo.save('photos/{0}'.format(filename),"PNG")
         self.bus.post(event('status_update',{'type':'photo','value':'end'}))
@@ -80,4 +80,7 @@ class Cameraman(subscriber):
         elif(type=='photo'):
             self.take_photo_with_overlay()
         elif(type=='status_update' and data['type']=='crosshair'):
-            self.last_crosshair_number = data['value']            
+            self.last_crosshair_number = data['value']
+
+    def get_crosshair_image(self):
+        return Image.open('crosshairs/crosshair' + str(self.last_crosshair_number) + '.png')
