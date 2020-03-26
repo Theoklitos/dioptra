@@ -1,4 +1,5 @@
 from geeteventbus.subscriber import subscriber
+from geeteventbus.event import event
 from PIL import Image
 
 
@@ -10,10 +11,10 @@ class Crosshair(subscriber):
 
     def __init__(self,bus,camera,resolution):
         self.camera = camera
+        self.bus = bus
         self.crosshair_overlay = None
         self.crosshair_number = 1
-        bus.register_consumer(self, 'crosshair')
-        self.set_crosshair(1)
+        bus.register_consumer(self, 'crosshair')        
 
     def process(self,event):
         topic = event.get_topic()
@@ -40,3 +41,4 @@ class Crosshair(subscriber):
             self.camera.remove_overlay(self.crosshair_overlay)
         self.crosshair_overlay = self.camera.add_overlay(pad.tobytes(), layer=3, size=img.size)
         self.crosshair_number = number
+        self.bus.post(event('status_update',{'type':'crosshair','value':self.crosshair_number}))

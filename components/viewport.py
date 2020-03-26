@@ -35,43 +35,52 @@ class Viewport(subscriber):
         elif(topic=='adjust'):
             self.adjust(data)
 
-    def zoom(self, direction):
-        if(direction == 'in'):
+    def zoom(self, type):
+        original_level = self.magnification_level
+        if(isinstance(type,int)):
+            self.magnification_level = type
+        elif(type == 'in'):
             if(self.magnification_level == 5):
                 return
             self.magnification_level = self.magnification_level + 1
-        elif(direction == 'out'):
+        elif(type == 'out'):
             if(self.magnification_level == 1):
                 return
             self.magnification_level = self.magnification_level - 1
 
-        base_levels = magnification_levels[self.magnification_level][0]
-        # we need to adjust for exising adjustments
-
-        self.camera.zoom = base_levels
+        # we first need to adjust for exising adjustments
+        base_level = magnification_levels[original_level][0]
+        current_level = self.camera.zoom
+        deviation = (round(base_level[0],3) - round(current_level[0],3),round(base_level[1],3) - round(current_level[1],3))
+        #print("Deviation: " + str(deviation))
+        new_level = magnification_levels[self.magnification_level][0]
+        adjusted_new_level = (round(new_level[0],3) - deviation[0],round(new_level[1],3) - deviation[1],new_level[2],new_level[3])
+        #print("Adjusted new level: " + str(adjusted_new_level))
+        self.camera.zoom = adjusted_new_level
         human_readable_value = magnification_levels[self.magnification_level][2]
-        self.bus.post(event('status_update',{'type':'magnification_level','value':human_readable_value}))
+        self.bus.post(event('status_update',{'type':'magnification_level','value':
+            {'human_readable_value':human_readable_value,'number':self.magnification_level,'x':round(self.camera.zoom[0],3),'y':round(self.camera.zoom[1],3)}
+        }))
 
-    def adjust(self, direction):
+    def adjust(self, type):
         step = magnification_levels[self.magnification_level][1]
         zoom = self.camera.zoom
         new_zoom = None
         tolerance = magnification_levels[self.magnification_level][0][0] * 2
-        if(direction=='up'):
+        if(isinstance(type,tuple)):
+            new_zoom = (type[0],type[1],zoom[2],zoom[3])
+        elif(type=='up'):
             new_zoom = (zoom[0]-step,zoom[1],zoom[2],zoom[3])
-            self.adjustement = (self.adjustement[0],round(self.adjustement[1]+step,5))
-        elif(direction=='down'):
+        elif(type=='down'):
             new_zoom = (zoom[0]+step,zoom[1],zoom[2],zoom[3])
             if(new_zoom[0]>tolerance):
                 return
-            self.adjustement = (self.adjustement[0],round(self.adjustement[1]-step,5))
-        elif(direction=='left'):
+        elif(type=='left'):
             new_zoom = (zoom[0],zoom[1]-step,zoom[2],zoom[3])
-            self.adjustement = (self.adjustement[0]-step,self.adjustement[1])
-        elif(direction=='right'):
+        elif(type=='right'):
             new_zoom = (zoom[0],zoom[1]+step,zoom[2],zoom[3])
             if(new_zoom[1]>tolerance):
                 return
-            self.adjustement = (self.adjustement[0]+step,self.adjustement[1])
         self.camera.zoom = new_zoom
+        self.adjustement = (round(self.camera.zoom[0],3), round(self.camera.zoom[1],3))
         self.bus.post(event('status_update',{'type':'adjustment','value':self.adjustement}))

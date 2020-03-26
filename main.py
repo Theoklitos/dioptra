@@ -7,11 +7,14 @@ from components.crosshair import Crosshair
 from components.buttons import Buttons
 from components.gui_text import GuiText
 from components.cameraman import Cameraman
+from components.file_reader import FileReader
 import sys, traceback, picamera, subprocess
 
 WIDTH = 1920
 HEIGHT = 1140
 RESOLUTION = (WIDTH, HEIGHT)
+
+from time import sleep
 
 try:
     camera = picamera.PiCamera()
@@ -21,6 +24,10 @@ try:
     crosshair = Crosshair(bus,camera,RESOLUTION)
     Buttons(bus,camera)
     gui_text = GuiText(bus,camera)
+    Cameraman(bus,camera)
+
+    filereader = FileReader(bus)
+    filereader.loadConfigFromFile()
 
     #gui_text.show_notification_for_seconds('This is a fucking test bra', 3)
     #gui_text.show_notification_for_seconds('Photo saved as 25-Mar-2020_15.46.54.png', 3)
@@ -34,10 +41,6 @@ try:
     #    '-c:a','copy','manual.mp4'
     #])
 
-    # injecting the crosshair here breaks the observer pattern, but we need it in order
-    # to add the currrent crosshair to videos/photos
-    Cameraman(bus,camera,crosshair)
-
     while True:
         pass
 
@@ -50,3 +53,4 @@ finally:
     user_input.touch_listener.stop()
     user_input.keyboard_listener.stop()
     camera.stop_preview()
+    filereader.saveToFile()
