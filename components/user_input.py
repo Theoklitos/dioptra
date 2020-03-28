@@ -47,3 +47,7 @@ class UserInput():
             self.bus.post(event('video', 'start'))
         elif(key == keyboard.KeyCode.from_char('b')):
             self.bus.post(event('video', 'end'))
+        elif(key == keyboard.KeyCode.from_char('o')):
+            self.bus.post(event('layout', 'options'))
+        elif(key == keyboard.KeyCode.from_char('i')):
+            self.bus.post(event('layout', 'standard'))

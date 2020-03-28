@@ -2,7 +2,6 @@ from geeteventbus.subscriber import subscriber
 from geeteventbus.event import event
 from PIL import Image
 
-
 #https://www.hiclipart.com/free-transparent-background-png-clipart-bxtmb
 #https://www.pngguru.com/search?png=scope
 
@@ -14,7 +13,7 @@ class Crosshair(subscriber):
         self.bus = bus
         self.crosshair_overlay = None
         self.crosshair_number = 1
-        bus.register_consumer(self, 'crosshair')        
+        bus.register_consumer(self, 'crosshair')
 
     def process(self,event):
         topic = event.get_topic()

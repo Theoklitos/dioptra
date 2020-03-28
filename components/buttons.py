@@ -15,8 +15,9 @@ class Buttons(subscriber):
         self.video_recording_overlay = None
         bus.register_consumer(self, 'touch')
         bus.register_consumer(self, 'status_update')
+        bus.register_consumer(self, 'layout')
         self.show_standard_layout()
-        #self.show_options_layout()
+
 
     def show_standard_layout(self):
         """The initial, default layout with only three buttons"""
@@ -57,15 +58,16 @@ class Buttons(subscriber):
         if(self.standard_overlay):
             self.camera.remove_overlay(self.standard_overlay)
             self.standard_overlay = None
-        options_overlay = self.camera.add_overlay(pad.tobytes(), pad.size, layer=4)
-        self.options_overlay = options_overlay
+        if(self.options_overlay):
+            self.options_overlay.update(pad.tobytes())
+        else:
+            options_overlay = self.camera.add_overlay(pad.tobytes(), pad.size, layer=4)
+            self.options_overlay = options_overlay
         self.bus.post(event('status_update',{'type':'layout','value':'options'}))
 
     def show_photo_in_progress_layout(self):
         """When a picture is being taken"""
         pad = Image.new('RGBA', (640,384,))
-        ok_image = Image.open('icons/ok.png')
-        pad.paste(ok_image, (550, 10), ok_image)
         crosshair_image = Image.open('icons/crosshair_change.png')
         pad.paste(crosshair_image, (550, 105), crosshair_image)
         video_image = Image.open('icons/video.png')
@@ -117,6 +119,11 @@ class Buttons(subscriber):
                 self.show_video_recording_in_progress_layout()
             elif(type=='video' and value =='end'):
                 self.show_options_layout()
+        elif(topic=='layout'):
+            if(data=='options'):
+                self.show_options_layout()
+            elif(data=='standard'):
+                self.show_standard_layout()
 
     def _is_point_within(self,x,y,area):
         return (x > area[0] and x < area[1]) & (y > area[2] and y < area[3])
@@ -152,4 +159,3 @@ class Buttons(subscriber):
         elif(self.video_recording_overlay):
             if self._is_point_within(x,y,(700,790,30,110)):
                 self.bus.post(event('video','end')) # again, this is a command. The status update (event) comes later
-                #self.show_options_layout()

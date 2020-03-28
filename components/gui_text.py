@@ -96,4 +96,4 @@ class GuiText(subscriber):
         if(self.text_overlay):
             self.text_overlay.update(gui_text_image.tobytes())
         else:
-            self.text_overlay = self.camera.add_overlay(gui_text_image.tobytes(),layer=4,size=gui_text_image.size)
+            self.text_overlay = self.camera.add_overlay(gui_text_image.tobytes(),layer=4,size=gui_text_image.size,alpha=128)

@@ -2,8 +2,6 @@ from geeteventbus.subscriber import subscriber
 from geeteventbus.event import event
 from ast import literal_eval as make_tuple
 
-import sys, traceback
-
 CONFIG_FILE = 'dioptra-config.txt'
 
 class FileReader(subscriber):
@@ -44,7 +42,7 @@ class FileReader(subscriber):
             self.saveToFile()
 
     def saveToFile(self):
-        config_file = open(CONFIG_FILE, 'w')        
+        config_file = open(CONFIG_FILE, 'w')
         config_file.write(str(self.latest_magnification_level) + "\n")
         config_file.write(str(self.latest_crosshair_number) + "\n")
         config_file.write(str(self.latest_adjustment))
