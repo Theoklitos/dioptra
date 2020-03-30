@@ -2,6 +2,7 @@ from geeteventbus.subscriber import subscriber
 from geeteventbus.event import event
 from time import sleep
 import picamera
+import socket
 
 magnification_levels = {
     1: [(0.05, 0.05, 0.9, 0.9),0.01,'1x'],
@@ -16,8 +17,15 @@ class Viewport(subscriber):
     def __init__(self,bus,camera,resolution):
         self.camera = camera
         camera.resolution = resolution
-        camera.brightness = 60
+        camera.brightness = 50
         camera.rotation = 270
+
+        #server_socket = socket.socket()
+        #server_socket.bind(('0.0.0.0', 8000))
+        #server_socket.listen(0)
+        #connection = server_socket.accept()[0].makefile('wb')
+        #camera.start_recording(connection,resize=(1920,1080),format='h264') #h264 #mjpeg
+
         camera.start_preview()
         sleep(1)
         self.bus = bus
