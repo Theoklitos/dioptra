@@ -5,23 +5,12 @@ from datetime import datetime
 from threading import Timer
 import picamera, sys, traceback
 
-class GuiText(subscriber):
-    """This is the view, the part of the GUI that displays information about the scope e.g. the magnification level"""
+class Gui(subscriber):
+    """?"""
     def __init__(self,bus,camera):
-        self.camera = camera
-        self.bus = bus
-        self.data = {
-            'magnification_level': '?',
-            'range': '?',
-            'x': '?',
-            'y': '?'
-        }
-        self.text_overlay = None
-        self.notification_overlay = None
-        self.timer = None
-        self.should_show_coords = False
-        bus.register_consumer(self, 'status_update')
-        bus.register_consumer(self, 'notification')
+        self.crosshair = None
+        bus.register_consumer(self,'status_update')
+        bus.register_consumer(self,'notification')
         self._update_overlay()
 
     def _remove_notification_overlay(self):
