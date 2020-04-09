@@ -2,7 +2,7 @@ from geeteventbus.event import event
 from pynput import mouse, keyboard
 
 class UserInput():
-    """Connects the user input to classes that need it or actions that are triggered by it"""
+    """Touch and keyboard interface. Basically receives events and triggers actions"""
 
     def __init__(self,bus):
         self.bus = bus
@@ -32,7 +32,7 @@ class UserInput():
             self.bus.post(event('zoom','in'))
         elif(key == keyboard.KeyCode.from_char('e')):
             self.bus.post(event('zoom','out'))
-        #temp bindings for testing
+        #bindings for keyboard control/testing
         elif(key == keyboard.KeyCode.from_char('z')):
             self.bus.post(event('crosshair','next'))
         elif(key == keyboard.KeyCode.from_char('1')):
