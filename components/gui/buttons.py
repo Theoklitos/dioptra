@@ -1,69 +1,49 @@
 from geeteventbus.subscriber import subscriber
 from geeteventbus.event import event
 from PIL import Image
-import picamera
+from .layout_type import LayoutType
 
-class Buttons(subscriber):
-    """Draws the buttons and switches between the different button overlays"""
-
-    def __init__(self,bus,camera):
-        self.camera = camera
+class ButtonLayout1(subscriber):
+    """Draws the buttons and switches between the different button overlays.
+    Unfortunately, this is hardcoded for 800x480."""
+    def __init__(self,bus):
+        self.type = LayoutType.Standard
         self.bus = bus
-        self.timestamp_of_last_touch = 0
-        self.standard_overlay = None
-        self.options_overlay = None
-        self.video_recording_overlay = None
-        bus.register_consumer(self, 'touch')
-        bus.register_consumer(self, 'status_update')
-        bus.register_consumer(self, 'layout')
-        self.show_standard_layout()
 
+    def draw_button_layout(self,image):
+        if(self.type == LayoutType.Standard):
+            self._draw_standard_layout(image)
+        elif(self.type == LayoutType.Options):
+            self._draw_options_layout(image)
 
-    def show_standard_layout(self):
+    def _draw_standard_layout(self,image):
         """The initial, default layout with only three buttons"""
-        #256/256 Large, 640/384 Medium, 736/480 Small - icon sizes
-        pad = Image.new('RGBA', (640,384,))
         zoom_in_image = Image.open('icons/zoom_in.png')
-        pad.paste(zoom_in_image, (550, 10), zoom_in_image)
+        image.paste(zoom_in_image, (700, 25), zoom_in_image)
         zoom_out_image = Image.open('icons/zoom_out.png')
-        pad.paste(zoom_out_image, (550, 105), zoom_out_image)
+        image.paste(zoom_out_image, (700, 125), zoom_out_image)
         options_image = Image.open('icons/options.png')
-        pad.paste(options_image, (550, 200), options_image)
-        if(self.options_overlay):
-            self.camera.remove_overlay(self.options_overlay)
-            self.options_overlay = None
-        standard_overlay = self.camera.add_overlay(pad.tobytes(), pad.size, layer=4)
-        self.standard_overlay = standard_overlay
-        self.bus.post(event('status_update',{'type':'layout','value':'standard'}))
+        image.paste(options_image, (700, 225), options_image)
 
-    def show_options_layout(self):
-        """The secondary layout with buttons that provide secondary functionality"""
-        pad = Image.new('RGBA', (640,384,))
+    def _draw_options_layout(self,image):
+        """The layout that overlays all the controls for recording, adjusting etc"""
         back_image = Image.open('icons/back.png')
-        pad.paste(back_image, (550, 10), back_image)
+        image.paste(back_image, (700, 25), back_image)
         crosshair_image = Image.open('icons/crosshair_change.png')
-        pad.paste(crosshair_image, (550, 105), crosshair_image)
+        image.paste(crosshair_image, (700, 125), crosshair_image)
         video_image = Image.open('icons/video.png')
-        pad.paste(video_image, (550, 200), video_image)
+        image.paste(video_image, (700, 225), video_image)
         photo_image = Image.open('icons/photo.png')
-        pad.paste(photo_image, (550, 295), photo_image)
+        image.paste(photo_image, (700, 325), photo_image)
+        # adjustment
         up_image = Image.open('icons/up.png')
-        pad.paste(up_image, (280, 10), up_image)
+        image.paste(up_image, (360, 15), up_image)
         down_image = Image.open('icons/down.png')
-        pad.paste(down_image, (280, 295), down_image)
+        image.paste(down_image, (360, 388), down_image)
         left_image = Image.open('icons/left.png')
-        pad.paste(left_image, (135, 154), left_image)
+        image.paste(left_image, (173, 195), left_image)
         right_image = Image.open('icons/right.png')
-        pad.paste(right_image, (425, 154), right_image)
-        if(self.standard_overlay):
-            self.camera.remove_overlay(self.standard_overlay)
-            self.standard_overlay = None
-        if(self.options_overlay):
-            self.options_overlay.update(pad.tobytes())
-        else:
-            options_overlay = self.camera.add_overlay(pad.tobytes(), pad.size, layer=4)
-            self.options_overlay = options_overlay
-        self.bus.post(event('status_update',{'type':'layout','value':'options'}))
+        image.paste(right_image, (555, 190), right_image)
 
     def show_photo_in_progress_layout(self):
         """When a picture is being taken"""
@@ -103,7 +83,7 @@ class Buttons(subscriber):
         video_recording_overlay = self.camera.add_overlay(pad.tobytes(), pad.size, layer=4)
         self.video_recording_overlay = video_recording_overlay
 
-    def process(self,event):
+    def process2(self,event):
         topic = event.get_topic()
         data = event.get_data()
         if(topic=='touch'):
@@ -128,18 +108,17 @@ class Buttons(subscriber):
     def _is_point_within(self,x,y,area):
         return (x > area[0] and x < area[1]) & (y > area[2] and y < area[3])
 
-    def _check_if_button_was_touched(self,coordinates):
+    def handle_touch(self,coordinates):
         x = coordinates[0]
         y = coordinates[1]
-        #self.camera.annotate_text = '(' + str(x) + ',' + str(y) + ')'
-        if(self.standard_overlay):
-            if self._is_point_within(x,y,(700,790,30,110)):
-                self.bus.post(event('zoom','in'))
-            elif self._is_point_within(x,y,(700,790,145,230)):
-                self.bus.post(event('zoom','out'))
-            elif self._is_point_within(x,y,(700,770,260,350)):
-                self.show_options_layout()
-        elif(self.options_overlay):
+        if(self.type == LayoutType.Standard):
+            if self._is_point_within(x,y,(710,790,40,110)):
+                self.bus.post(event('command:zoom',{'type':'digital','direction':'in'}))
+            elif self._is_point_within(x,y,(710,790,145,215)):
+                self.bus.post(event('command:zoom',{'type':'digital','direction':'out'}))
+            elif self._is_point_within(x,y,(710,790,240,310)):
+                self.bus.post(event('command:layout_change',{'type':None,'value':LayoutType.Standard}))
+        elif(self.type == LayoutType.Options):
             if self._is_point_within(x,y,(700,790,30,110)):
                 self.show_standard_layout()
             elif self._is_point_within(x,y,(700,790,145,230)):
@@ -156,6 +135,6 @@ class Buttons(subscriber):
                 self.bus.post(event('adjust','left'))
             elif self._is_point_within(x,y,(540,640,200,300)):
                 self.bus.post(event('adjust','right'))
-        elif(self.video_recording_overlay):
+        elif(self.type == LayoutType.Recording):
             if self._is_point_within(x,y,(700,790,30,110)):
                 self.bus.post(event('video','end')) # again, this is a command. The status update (event) comes later

@@ -1,5 +1,6 @@
 from geeteventbus.event import event
 from pynput import mouse, keyboard
+from .gui.layout_type import LayoutType
 
 class UserInput():
     """Touch and keyboard interface. Basically receives events and triggers actions"""
@@ -29,9 +30,9 @@ class UserInput():
             self.bus.post(event('adjust','down'))
         #zooms
         elif(key == keyboard.KeyCode.from_char('q')):
-            self.bus.post(event('zoom','in'))
+            self.bus.post(event('command:zoom',{'type':'digital','direction':'in'}))
         elif(key == keyboard.KeyCode.from_char('e')):
-            self.bus.post(event('zoom','out'))
+            self.bus.post(event('command:zoom',{'type':'digital','direction':'out'}))
         #bindings for keyboard control/testing
         elif(key == keyboard.KeyCode.from_char('z')):
             self.bus.post(event('crosshair','next'))
@@ -48,6 +49,6 @@ class UserInput():
         elif(key == keyboard.KeyCode.from_char('b')):
             self.bus.post(event('video', 'end'))
         elif(key == keyboard.KeyCode.from_char('o')):
-            self.bus.post(event('layout', 'options'))
+            self.bus.post(event('command:layout_change',{'value':LayoutType.Options}))
         elif(key == keyboard.KeyCode.from_char('i')):
-            self.bus.post(event('layout', 'standard'))
+            self.bus.post(event('command:layout_change',{'value':LayoutType.Standard}))
