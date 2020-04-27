@@ -9,13 +9,13 @@ logging.basicConfig(format='%(asctime)s,%(msecs)d %(levelname)-8s (%(threadName)
     datefmt='%Y-%m-%d:%H:%M:%S',
     level=logging.DEBUG)
 
-VERSION = 1.1
+VERSION = 1.2
 screen_properties = {
     'resolution':(800,480),
     'ppmm':9.2 #pixels per milimeter, based on your screen's ppi
 }
 
-if(__name__ == '__main__'):
+if __name__ == '__main__':
     bus = eventbus()
     camera = Camera(bus,screen_properties)
     UserInput(bus)

@@ -2,10 +2,11 @@ from geeteventbus.event import event
 from pynput import mouse, keyboard
 from .gui.layout_type import LayoutType
 
-class UserInput():
+
+class UserInput:
     """Touch and keyboard interface. Basically receives events and triggers actions"""
 
-    def __init__(self,bus):
+    def __init__(self, bus):
         self.bus = bus
         touch_listener = mouse.Listener(on_click=self.on_touch)
         touch_listener.start()
@@ -14,41 +15,41 @@ class UserInput():
         keyboard_listener.start()
         self.keyboard_listener = keyboard_listener
 
-    def on_touch(self,x,y,button,pressed):
-        if(pressed):
-            self.bus.post(event('touch',(x,y)))
+    def on_touch(self, x, y, button, pressed):
+        if pressed:
+            self.bus.post(event('touch', (x, y)))
 
-    def on_keyboard_key_press(self,key):
-        #adjustements
-        if(key == keyboard.KeyCode.from_char('a')):
-            self.bus.post(event('adjust','left'))
-        elif(key == keyboard.KeyCode.from_char('d')):
-            self.bus.post(event('adjust','right'))
-        elif(key == keyboard.KeyCode.from_char('w')):
-            self.bus.post(event('adjust','up'))
-        elif(key == keyboard.KeyCode.from_char('s')):
-            self.bus.post(event('adjust','down'))
-        #zooms
-        elif(key == keyboard.KeyCode.from_char('q')):
-            self.bus.post(event('command:zoom',{'type':'digital','direction':'in'}))
-        elif(key == keyboard.KeyCode.from_char('e')):
-            self.bus.post(event('command:zoom',{'type':'digital','direction':'out'}))
-        #bindings for keyboard control/testing
-        elif(key == keyboard.KeyCode.from_char('z')):
-            self.bus.post(event('crosshair','next'))
-        elif(key == keyboard.KeyCode.from_char('1')):
-            self.bus.post(event('crosshair',1))
-        elif(key == keyboard.KeyCode.from_char('2')):
-            self.bus.post(event('crosshair',2))
-        elif(key == keyboard.KeyCode.from_char('3')):
-            self.bus.post(event('crosshair',3))
-        elif(key == keyboard.KeyCode.from_char('p')):
-            self.bus.post(event('photo', 'start'))
-        elif(key == keyboard.KeyCode.from_char('v')):
+    def on_keyboard_key_press(self, key):
+        # adjustements
+        if key == keyboard.KeyCode.from_char('w'):
+            self.bus.post(event('command:adjust', {'direction': 'up'}))
+        elif key == keyboard.KeyCode.from_char('s'):
+            self.bus.post(event('command:adjust', {'direction': 'down'}))
+        elif key == keyboard.KeyCode.from_char('a'):
+            self.bus.post(event('command:adjust', {'direction': 'left'}))
+        elif key == keyboard.KeyCode.from_char('d'):
+            self.bus.post(event('command:adjust', {'direction': 'right'}))
+        # zooms
+        elif key == keyboard.KeyCode.from_char('q'):
+            self.bus.post(event('command:zoom', {'type': 'digital', 'direction': 'in'}))
+        elif key == keyboard.KeyCode.from_char('e'):
+            self.bus.post(event('command:zoom', {'type': 'digital', 'direction': 'out'}))
+        # bindings for keyboard control/testing
+        elif key == keyboard.KeyCode.from_char('z'):
+            self.bus.post(event('crosshair', 'next'))
+        elif key == keyboard.KeyCode.from_char('1'):
+            self.bus.post(event('crosshair', 1))
+        elif key == keyboard.KeyCode.from_char('2'):
+            self.bus.post(event('crosshair', 2))
+        elif key == keyboard.KeyCode.from_char('3'):
+            self.bus.post(event('crosshair', 3))
+        elif key == keyboard.KeyCode.from_char('p'):
+            self.bus.post(event('command:photo', {}))
+        elif key == keyboard.KeyCode.from_char('v'):
             self.bus.post(event('video', 'start'))
-        elif(key == keyboard.KeyCode.from_char('b')):
+        elif key == keyboard.KeyCode.from_char('b'):
             self.bus.post(event('video', 'end'))
-        elif(key == keyboard.KeyCode.from_char('o')):
-            self.bus.post(event('command:layout_change',{'value':LayoutType.Options}))
-        elif(key == keyboard.KeyCode.from_char('i')):
-            self.bus.post(event('command:layout_change',{'value':LayoutType.Standard}))
+        elif key == keyboard.KeyCode.from_char('o'):
+            self.bus.post(event('command:layout_change', {'value': LayoutType.Options}))
+        elif key == keyboard.KeyCode.from_char('i'):
+            self.bus.post(event('command:layout_change', {'value': LayoutType.Standard}))
