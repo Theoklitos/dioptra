@@ -1,6 +1,6 @@
 geeteventbus==1.0
 picamera==1.13
-Pillow==7.0.0
+Pillow==8.3.2
 pynput==1.6.8
 python-xlib==0.26
 six==1.14.0
